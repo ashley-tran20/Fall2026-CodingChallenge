@@ -1,0 +1,59 @@
+.leftBar {
+  width: 72px;
+  height: 100vh;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  border-right: 1px solid white;
+  box-sizing: border-box;
+}
+
+.menuIcons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 56px;
+}
+
+.menuIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 16px;
+  margin-top: 8px;
+}
+
+.notificationIconWrapper {
+  position: relative;
+}
+
+.notificationDot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background-color: #e0245e;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.leftBar {
+  border-right: 1px solid #e0e0e0;
+  height: 100vh;
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

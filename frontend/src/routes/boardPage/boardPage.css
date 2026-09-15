@@ -1,0 +1,237 @@
+.boardPageTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.boardMenuWrapper {
+  position: relative;
+}
+
+.boardMenuDropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.boardMenuDropdown button {
+  display: block;
+  width: 100%;
+  padding: 10px 20px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.boardMenuDropdown button:hover {
+  background-color: #f1f1f1;
+}
+
+.privateBadge {
+  display: inline-block;
+  background-color: #767676;
+  color: white;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  margin-left: 8px;
+}
+
+.editBoardForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editBoardForm input[type="text"] {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+}
+
+.privacyToggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  font-size: 15px;
+}
+
+.editBoardForm button[type="submit"] {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background-color: white;
+  color: #48aaad;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editBoardForm button[type="submit"]:hover {
+  background-color: #f1f1f1;
+}
+
+.inviteModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.inviteModal {
+  background-color: #48aaad;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.inviteModalText {
+  color: white;
+  font-family: Georgia, serif;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.modalSwimmers {
+  display: block;
+  margin: 0 auto 20px;
+  max-width: 280px;
+  width: 100%;
+  image-rendering: pixelated;
+}
+
+.confirmModalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.confirmCancelButton,
+.confirmDeleteButton {
+  padding: 10px 24px;
+  border-radius: 999px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.confirmCancelButton {
+  background-color: white;
+  color: #48aaad;
+}
+
+.confirmCancelButton:hover {
+  background-color: #f1f1f1;
+}
+
+.confirmDeleteButton {
+  background-color: #e0245e;
+  color: white;
+}
+
+.confirmDeleteButton:hover {
+  background-color: #c01e4e;
+}
+
+.inviteForm {
+  display: flex;
+  gap: 8px;
+}
+
+.inviteForm input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: none;
+  font-size: 14px;
+}
+
+.inviteForm button {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background-color: white;
+  color: #48aaad;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.inviteForm button:hover {
+  background-color: #f1f1f1;
+}
+
+.inviteError {
+  color: white;
+  background-color: rgba(224, 36, 94, 0.8);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.collaboratorsSection {
+  margin: 16px 0;
+}
+
+.collaboratorsHeader {
+  margin-bottom: 12px;
+}
+
+.addCollaboratorsPill {
+  background-color: #48aaad;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 24px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addCollaboratorsPill:hover {
+  background-color: #3d9295;
+}
+
+.collaboratorsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.collaboratorChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f1f1f1;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.removeCollaboratorButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #767676;
+  line-height: 1;
+}
+
+.removeCollaboratorButton:hover {
+  color: #e0245e;
+}

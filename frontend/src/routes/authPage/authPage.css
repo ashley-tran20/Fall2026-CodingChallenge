@@ -1,0 +1,50 @@
+.authPage {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 32px;
+  padding:32px;
+  border-radius:32px;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  padding: 32px;
+}
+
+.formGroup {
+display: flex;
+  width: 100%;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup input{
+    padding:16px;
+    border:2px solid #e0e0e0;
+    border-radius: 16px;
+}
+
+.authContainer h1{
+    font-weight: 400;
+}
+
+.authContainer form{
+    width:100%;
+    display:flex;
+    flex-direction: column;
+    gap:16px;
+}
+
+

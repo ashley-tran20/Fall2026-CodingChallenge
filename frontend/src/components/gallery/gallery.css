@@ -1,0 +1,18 @@
+.galleryColumns {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+}
+
+.galleryColumn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 1200px) {
+  .galleryColumns {
+    gap: 12px;
+  }
+}

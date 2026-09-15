@@ -1,0 +1,79 @@
+.saveToBoardOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.saveToBoardPopover {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.saveToBoardPopover h3 {
+  margin: 0 0 12px;
+}
+
+.boardList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.boardOption {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  background: #f1f1f1;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.boardOption:hover {
+  background: #e0e0e0;
+}
+
+.newBoardForm {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.newBoardForm input {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.newBoardForm button,
+.createBoardTrigger,
+.saveWithoutBoard {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.createBoardTrigger {
+  background: none;
+  border: 1px dashed #ccc;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.saveWithoutBoard {
+  background: #48aaad;
+  color: white;
+  width: 100%;
+}

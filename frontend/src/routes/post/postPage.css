@@ -1,0 +1,173 @@
+.postPage {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin-top: 32px;
+  padding: 0 32px;
+  position: relative;
+}
+
+.backButton {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  width: 32px;
+  height: 32px;
+}
+
+.postContainer {
+  width: 96%;
+  max-width: 1800px;
+  height: 600px;
+  display: flex;
+  border: 1px solid #e9e9e9;
+  border-radius: 32px;
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.postDetails {
+  flex: 1;
+  height: 600px;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.postImg {
+  flex: 1;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.postImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.postUser {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.postUser span {
+  font-size: 14px;
+}
+
+.pixabayAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #48AAAD;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.commentsSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  max-height: 260px;
+}
+
+.moreLikeThis {
+  width: 96%;
+  max-width: 1800px;
+}
+
+.moreLikeThis h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.relatedGrid {
+  column-count: 4;
+  column-gap: 16px;
+}
+
+.relatedCard {
+  position: relative;
+  break-inside: avoid;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.relatedCard img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+.relatedOverlay {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  z-index: 1;
+}
+
+.relatedCard:hover .relatedOverlay {
+  display: block;
+}
+
+.relatedShareButton,
+.relatedSaveButton {
+  z-index: 2;
+}
+
+@media (max-width: 1127px) {
+  .postContainer {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    flex-direction: column;
+  }
+
+  .postDetails {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .postImg {
+    width: 100%;
+    height: 400px;
+  }
+}
+
+@media (max-width: 900px) {
+  .relatedGrid {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 751px) {
+  .postContainer {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .relatedGrid {
+    column-count: 2;
+  }
+}

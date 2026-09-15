@@ -4,16 +4,12 @@
   It's flex because it can move around
   The gap between the left and the right side of the screen is 16px
   */
-  width:100%;
+  width: 100%;
   display: flex;
-  gap: 16px;
+  gap: 16;
 }
 
-.content{
-  background-color: violet;
-  flex:1;
+.content {
+  flex: 1;
   margin-right: 16px;
 }
-
-
-

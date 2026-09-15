@@ -1,0 +1,17 @@
+.postInteractions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.topRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leftIcons {
+  display: flex;
+  gap: 4px;
+  margin-left: -12px;
+}
