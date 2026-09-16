@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router";
+import { useParams, Link } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import apiRequest from "../../utils/apiRequest";
 import { useCurrentUser } from "../../hooks/useCurrentUser";
@@ -157,7 +157,15 @@ const BoardPage = () => {
       <div className="boardPageHeader">
         <div className="boardPageTitleRow">
           <h1>{board.title}</h1>
-          {isOwner && (
+        </div>
+        {board.description && <p>{board.description}</p>}
+        <span>{pins?.length ?? 0} Pins</span>
+        {board.isPrivate && <span className="privateBadge">Private</span>}
+      </div>
+
+      {isOwner && (
+        <div className="collaboratorsSection">
+          <div className="collaboratorsHeader">
             <div className="boardMenuWrapper">
               <IconButton onClick={() => setShowMenu((prev) => !prev)}>
                 <MoreHorizIcon />
@@ -168,18 +176,8 @@ const BoardPage = () => {
                 </div>
               )}
             </div>
-          )}
-        </div>
-        {board.description && <p>{board.description}</p>}
-        <span>{pins?.length ?? 0} Pins</span>
-        {board.isPrivate && <span className="privateBadge">Private</span>}
-      </div>
-
-      {isOwner && (
-        <div className="collaboratorsSection">
-          <div className="collaboratorsHeader">
             <button
-              className="addCollaboratorsPill"
+              className="addCollaboratorsButton"
               onClick={() => setShowInviteModal(true)}
             >
               Add Collaborators
@@ -307,7 +305,7 @@ const BoardPage = () => {
                 alt={pin.title}
                 onError={handleImageError}
               />
-              <div className="boardPinOverlay" />
+              <Link to={`/pin/${pin._id}`} className="boardPinOverlay" />
 
               {canDeletePins && (
                 <IconButton

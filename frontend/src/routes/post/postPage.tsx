@@ -17,6 +17,7 @@ interface PixabayImage {
   imageWidth: number;
   imageHeight: number;
   user: string;
+  description?: string;
 }
 
 const isMongoId = (value: string) => /^[a-f\d]{24}$/i.test(value);
@@ -43,6 +44,7 @@ const PostPage = () => {
           imageWidth: pin.width,
           imageHeight: pin.height,
           user: pin.user?.userName || "Unknown",
+          description: pin.description,
         });
       } else {
         const apiKey = import.meta.env.VITE_PIXABAY_API_KEY;
@@ -135,6 +137,10 @@ const PostPage = () => {
             </div>
             <span>{image.user}</span>
           </div>
+
+          {image.description && (
+            <p className="postDescription">{image.description}</p>
+          )}
 
           <div className="commentsSection">
             {isMongoId(String(image.id)) && (

@@ -19,8 +19,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-top: 8px;
-  flex-shrink: 0; /* prevents the form itself from getting squeezed/cut */
+  margin-top: 24px;
 }
 
 .comment {
@@ -66,9 +65,13 @@
   font-size: 14px;
 }
 
-
-.emojiPicker{
-    position:absolute;
-    right:0;
-    bottom:50px;
+.commentForm {
+  background-color: #f1f1f1;
+  padding: 18px 20px;
+  border-radius: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: auto;
+  min-height: 24px;
 }

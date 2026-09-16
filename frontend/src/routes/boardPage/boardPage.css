@@ -190,10 +190,14 @@
 }
 
 .collaboratorsHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
   margin-bottom: 12px;
 }
 
-.addCollaboratorsPill {
+.addCollaboratorsButton {
   background-color: #48aaad;
   color: white;
   border: none;
@@ -203,7 +207,7 @@
   cursor: pointer;
 }
 
-.addCollaboratorsPill:hover {
+.addCollaboratorsButton:hover {
   background-color: #3d9295;
 }
 
@@ -234,4 +238,83 @@
 
 .removeCollaboratorButton:hover {
   color: #e0245e;
+}
+
+.boardPinsGrid {
+  column-count: 5;
+  column-gap: 16px;
+  padding: 24px 0;
+}
+
+.boardPinCard {
+  cursor: pointer;
+  break-inside: avoid;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.boardPinImageWrapper {
+  position: relative;
+}
+
+.boardPinImageWrapper img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+.boardPinOverlay {
+  display: none;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  z-index: 1;
+}
+
+.boardPinImageWrapper:hover .boardPinOverlay {
+  display: block;
+}
+
+.boardPinShareButton,
+.boardPinSaveButton,
+.boardPinDeleteButton {
+  z-index: 2;
+}
+
+.boardPinTitle {
+  display: block;
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+@media (max-width: 1200px) {
+  .boardPinsGrid {
+    column-count: 4;
+  }
+}
+
+@media (max-width: 900px) {
+  .boardPinsGrid {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 600px) {
+  .boardPinsGrid {
+    column-count: 2;
+  }
+}
+.boardPageHeader {
+  text-align: center;
+}
+
+.boardPageTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
