@@ -12,6 +12,7 @@ interface Board {
   _id: string;
   title: string;
   user: string | { _id: string };
+  isPrivate?: boolean;
 }
 
 interface CollaborateBoardProps {
@@ -113,6 +114,7 @@ const CollaborateBoard = ({ board, userId }: CollaborateBoardProps) => {
       </div>
       <span className="boardName">{board.title}</span>
       <span className="boardMeta">{pins?.length ?? 0} Pins</span>
+      {board.isPrivate && <span className="privateBadge">Private</span>}
 
       {showConfirm && (
         <div

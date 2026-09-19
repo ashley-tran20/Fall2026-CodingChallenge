@@ -19,6 +19,8 @@ interface GalleryItemProps {
   onImageClick: (image: PixabayImage) => void;
 }
 
+const FALLBACK_IMAGE = "/fallback-image.png";
+
 const GalleryItem = ({ image, onImageClick }: GalleryItemProps) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
 
@@ -35,9 +37,20 @@ const GalleryItem = ({ image, onImageClick }: GalleryItemProps) => {
     }
   };
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    if (e.currentTarget.src !== window.location.origin + FALLBACK_IMAGE) {
+      e.currentTarget.src = FALLBACK_IMAGE;
+    }
+  };
+
   return (
     <div className="galleryItem">
-      <img src={image.webformatURL} alt={image.tags} loading="lazy" />
+      <img
+        src={image.webformatURL}
+        alt={image.tags}
+        loading="lazy"
+        onError={handleImageError}
+      />
       <Link
         to={`/pin/${image.id}`}
         className="overlay"

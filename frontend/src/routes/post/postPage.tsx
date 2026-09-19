@@ -18,6 +18,7 @@ interface PixabayImage {
   imageHeight: number;
   user: string;
   description?: string;
+  isMongoUser?: boolean;
 }
 
 const isMongoId = (value: string) => /^[a-f\d]{24}$/i.test(value);
@@ -45,6 +46,7 @@ const PostPage = () => {
           imageHeight: pin.height,
           user: pin.user?.userName || "Unknown",
           description: pin.description,
+          isMongoUser: true,
         });
       } else {
         const apiKey = import.meta.env.VITE_PIXABAY_API_KEY;
@@ -52,7 +54,7 @@ const PostPage = () => {
           `https://pixabay.com/api/?key=${apiKey}&id=${id}`,
         );
         const data = await response.json();
-        setImage(data.hits[0]);
+        setImage({ ...data.hits[0], isMongoUser: false });
       }
     };
 
@@ -131,12 +133,22 @@ const PostPage = () => {
         <div className="postDetails">
           <PostInteractions image={image} />
 
-          <div className="postUser">
-            <div className="pixabayAvatar">
-              {image.user?.[0]?.toUpperCase()}
+          {image.isMongoUser ? (
+            <Link to={`/${image.user}`} className="postUser">
+              <div className="pixabayAvatar">
+                {image.user?.[0]?.toUpperCase()}
+              </div>
+              <span>{image.user}</span>
+            </Link>
+          ) : (
+            <div className="postUser">
+              <div className="pixabayAvatar">
+                {image.user?.[0]?.toUpperCase()}
+              </div>
+              <span>{image.user}</span>
+              <span className="externalCreatorTag">External creator</span>
             </div>
-            <span>{image.user}</span>
-          </div>
+          )}
 
           {image.description && (
             <p className="postDescription">{image.description}</p>

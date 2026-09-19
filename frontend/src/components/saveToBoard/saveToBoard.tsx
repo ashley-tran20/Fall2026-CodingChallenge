@@ -30,14 +30,30 @@ const SaveToBoard = ({ pinData, onClose }: SaveToBoardProps) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: currentUser } = useCurrentUser();
+  const { data: currentUser, isLoading: userLoading } = useCurrentUser();
 
-  const { data: boards, isPending } = useQuery({
+  const { data: ownedBoards, isPending: ownedPending } = useQuery({
     queryKey: ["boards", currentUser?._id],
     queryFn: () =>
       apiRequest.get(`/boards/user/${currentUser._id}`).then((res) => res.data),
     enabled: !!currentUser?._id,
   });
+
+  const { data: collabBoards, isPending: collabPending } = useQuery({
+    queryKey: ["collaboratedBoards", currentUser?._id],
+    queryFn: () =>
+      apiRequest
+        .get(`/boards/collaborator/${currentUser._id}`)
+        .then((res) => res.data),
+    enabled: !!currentUser?._id,
+  });
+
+  const isPending = ownedPending || collabPending;
+
+  const allBoardsMap = new Map<string, Board>();
+  ownedBoards?.forEach((b: Board) => allBoardsMap.set(b._id, b));
+  collabBoards?.forEach((b: Board) => allBoardsMap.set(b._id, b));
+  const boards = Array.from(allBoardsMap.values());
 
   const goToProfile = () => {
     onClose();
@@ -72,6 +88,28 @@ const SaveToBoard = ({ pinData, onClose }: SaveToBoardProps) => {
     createBoardMutation.mutate(newBoardTitle.trim());
   };
 
+  if (userLoading) {
+    return (
+      <div className="saveToBoardOverlay" onClick={onClose}>
+        <div className="saveToBoardPopover" onClick={(e) => e.stopPropagation()}>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="inviteModalOverlay" onClick={onClose}>
+        <div className="inviteModal" onClick={(e) => e.stopPropagation()}>
+          <p className="inviteModalText">
+            You aren't signed in so you can't use this feature!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="saveToBoardOverlay" onClick={onClose}>
       <div className="saveToBoardPopover" onClick={(e) => e.stopPropagation()}>
@@ -80,7 +118,7 @@ const SaveToBoard = ({ pinData, onClose }: SaveToBoardProps) => {
         {isPending && <p>Loading boards...</p>}
 
         <div className="boardList">
-          {boards?.map((board: Board) => (
+          {boards.map((board: Board) => (
             <button
               key={board._id}
               className="boardOption"

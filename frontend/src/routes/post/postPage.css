@@ -56,23 +56,39 @@
   align-items: center;
   gap: 8px;
   font-weight: 600;
+  text-decoration: none;
+  color: inherit;
 }
 
 .postUser span {
   font-size: 14px;
 }
 
+.externalCreatorTag {
+  font-size: 11px;
+  color: #767676;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
 .pixabayAvatar {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: #48AAAD;
+  background-color: #48aaad;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   font-size: 13px;
+}
+
+.postDescription {
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  margin: 8px 0 0;
 }
 
 .commentsSection {
@@ -169,11 +185,4 @@
   .relatedGrid {
     column-count: 2;
   }
-}
-
-.postDescription {
-  font-size: 14px;
-  color: #333;
-  line-height: 1.5;
-  margin: 8px 0 0;
 }

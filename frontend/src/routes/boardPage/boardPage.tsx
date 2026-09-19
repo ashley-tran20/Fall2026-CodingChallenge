@@ -46,9 +46,14 @@ const BoardPage = () => {
 
   const [confirmDeletePin, setConfirmDeletePin] = useState<Pin | null>(null);
 
-  const { data: board, isPending: boardPending } = useQuery({
+  const {
+    data: board,
+    isPending: boardPending,
+    error: boardError,
+  } = useQuery({
     queryKey: ["board", id],
     queryFn: () => apiRequest.get(`/boards/${id}`).then((res) => res.data),
+    retry: false,
   });
   const { data: pins, isPending: pinsPending } = useQuery({
     queryKey: ["pins", "board", id],
@@ -144,12 +149,22 @@ const BoardPage = () => {
   };
 
   if (boardPending || pinsPending) return <p>Loading...</p>;
+
+  if (boardError) {
+    const status = (boardError as any)?.response?.status;
+    if (status === 403) {
+      return <p>This board is private.</p>;
+    }
+    return <p>Something went wrong loading this board.</p>;
+  }
+
   if (!board) return <p>Board not found.</p>;
 
   const isOwner = currentUser?._id === board.user._id;
   const isCollaborator = board.collaborators?.some(
     (c: Collaborator) => c._id === currentUser?._id,
   );
+  const canManage = isOwner || isCollaborator;
   const canDeletePins = isOwner || isCollaborator;
 
   return (
@@ -163,7 +178,7 @@ const BoardPage = () => {
         {board.isPrivate && <span className="privateBadge">Private</span>}
       </div>
 
-      {isOwner && (
+      {canManage && (
         <div className="collaboratorsSection">
           <div className="collaboratorsHeader">
             <div className="boardMenuWrapper">
@@ -188,12 +203,14 @@ const BoardPage = () => {
             {board.collaborators?.map((c: Collaborator) => (
               <div key={c._id} className="collaboratorChip">
                 <span>@{c.userName}</span>
-                <button
-                  onClick={() => removeCollaboratorMutation.mutate(c._id)}
-                  className="removeCollaboratorButton"
-                >
-                  ×
-                </button>
+                {isOwner && (
+                  <button
+                    onClick={() => removeCollaboratorMutation.mutate(c._id)}
+                    className="removeCollaboratorButton"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
             ))}
           </div>
