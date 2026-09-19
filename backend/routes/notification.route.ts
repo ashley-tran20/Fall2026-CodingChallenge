@@ -1,3 +1,5 @@
+// Notification routes - all require login, since notifications 
+// are always tied to a specific logged in recipent
 import express from "express";
 import { verifyToken } from "../middleware/verifyToken";
 import {

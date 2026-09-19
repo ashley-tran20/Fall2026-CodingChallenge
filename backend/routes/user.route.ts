@@ -1,3 +1,4 @@
+
 import express from "express";
 import {
   test,
@@ -6,11 +7,10 @@ import {
   registerUser,
   loginUser,
   logoutUser,
-  getCurrentUser
+  getCurrentUser,
 } from "../controllers/user.controller";
 import User from "../models/user.model";
 import { verifyToken } from "../middleware/verifyToken";
-
 
 const router = express.Router();
 router.get("/auth/me", verifyToken, getCurrentUser);
@@ -31,6 +31,5 @@ router.get("/fetch", async (req, res) => {
 router.get("/test", test);
 router.get("/search", searchUsers);
 router.get("/:username", getUser);
-
 
 export default router;

@@ -1,3 +1,6 @@
+// Pin routes. "/upload" must be registered before "/:id", since 
+// ":id" would match the word "upload" as if it were a pin ID. 
+// All writes (create/upload/delete) require login;
 import express from "express";
 import { verifyToken } from "../middleware/verifyToken";
 import upload from "../middleware/upload";

@@ -5,7 +5,9 @@ export const getCommentsByPin = async (req: Request, res: Response) => {
   try {
     const pinId = req.params.pinId as string;
 
+    // Find all the comments that exist on this particular Pin
     const comments = await Comment.find({ pin: pinId })
+    // Older comments go first 
       .sort({ createdAt: 1 })
       .populate("user", "userName img");
 
@@ -24,7 +26,9 @@ export const createComment = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-
+    // Can only comment if pinID is valid
+    // Checks if text is just white space and removes all the white space 
+    // Won't allow comments to be empty
     if (!pinId || !text?.trim()) {
       return res.status(400).json({ message: "pinId and text are required" });
     }

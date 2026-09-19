@@ -15,6 +15,11 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "All fields are required!" });
     }
 
+    const existingUser = await User.findOne({ userName: username });
+    if (existingUser) {
+      return res.status(400).json({ message: "Username already taken" });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -23,9 +28,21 @@ export const registerUser = async (req: Request, res: Response) => {
       hashedPassword,
     });
 
+    const age = 1000 * 60 * 60 * 24 * 7; // 7 days
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
+      expiresIn: age,
+    });
+
     const { hashedPassword: _, ...detailsWithoutPassword } = user.toObject();
 
-    res.status(201).json(detailsWithoutPassword);
+    res
+      .cookie("token", token, {
+        httpOnly: true,
+        maxAge: age,
+      })
+      .status(201)
+      .json(detailsWithoutPassword);
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Something went wrong" });
