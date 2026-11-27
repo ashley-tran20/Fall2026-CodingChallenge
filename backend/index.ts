@@ -33,8 +33,159 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Pixabay cache and request limits
+const CACHE_DURATION = 24 * 60 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 200;
+const REQUEST_WINDOW = 60 * 1000;
+const MAX_REQUESTS = 60;
+
+const imageCache = new Map<
+  string,
+  { data: unknown; expiresAt: number }
+>();
+
+let requestCount = 0;
+let windowStart = Date.now();
+
 app.get("/", (req, res) => {
   res.send("Pinny API is running!");
+});
+
+app.get("/pixabay", async (req, res) => {
+  try {
+    const apiKey = process.env.PIXABAY_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({
+        error: "Image service is not configured",
+      });
+    }
+
+    const q = String(req.query.q || "nature").trim();
+    const id = String(req.query.id || "");
+    const page = Number(req.query.page || 1);
+    const perPage = Number(req.query.per_page || 20);
+
+    if (
+      q.length > 100 ||
+      (id && !/^\d+$/.test(id)) ||
+      !Number.isInteger(page) ||
+      page < 1 ||
+      page > 100 ||
+      !Number.isInteger(perPage) ||
+      perPage < 3 ||
+      perPage > 20
+    ) {
+      return res.status(400).json({
+        error: "Invalid image search parameters",
+      });
+    }
+
+    const cacheKey = id
+      ? `id:${id}`
+      : JSON.stringify([q.toLowerCase(), page, perPage]);
+
+    const now = Date.now();
+
+    // Remove expired cache entries
+    for (const [key, entry] of imageCache) {
+      if (entry.expiresAt <= now) {
+        imageCache.delete(key);
+      }
+    }
+
+    // Return cached results without calling Pixabay
+    const cached = imageCache.get(cacheKey);
+
+    if (cached) {
+      return res.json(cached.data);
+    }
+
+    // Reset the request window every minute
+    if (now - windowStart >= REQUEST_WINDOW) {
+      windowStart = now;
+      requestCount = 0;
+    }
+
+    // Protect the shared Pixabay API quota
+    if (requestCount >= MAX_REQUESTS) {
+      res.set(
+        "Retry-After",
+        String(
+          Math.ceil(
+            (REQUEST_WINDOW - (now - windowStart)) / 1000
+          )
+        )
+      );
+
+      return res.status(429).json({
+        error: "Too many image requests. Please try again shortly.",
+      });
+    }
+
+    requestCount++;
+
+    const params = new URLSearchParams({
+      key: apiKey,
+      safesearch: "true",
+    });
+
+    if (id) {
+      params.set("id", id);
+    } else {
+      params.set("q", q);
+      params.set("page", String(page));
+      params.set("per_page", String(perPage));
+    }
+
+    const response = await fetch(
+      `https://pixabay.com/api/?${params.toString()}`,
+      {
+        signal: AbortSignal.timeout(10000),
+      }
+    );
+
+    if (response.status === 429) {
+      return res.status(429).json({
+        error: "Image service limit reached. Please try again later.",
+      });
+    }
+
+    if (!response.ok) {
+      return res.status(502).json({
+        error: "Image service request failed",
+      });
+    }
+
+    const data = await response.json();
+
+    if (!Array.isArray(data.hits)) {
+      return res.status(502).json({
+        error: "Invalid image service response",
+      });
+    }
+
+    // Keep the cache size bounded
+    if (imageCache.size >= MAX_CACHE_ENTRIES) {
+      const oldestKey = imageCache.keys().next().value;
+
+      if (oldestKey !== undefined) {
+        imageCache.delete(oldestKey);
+      }
+    }
+
+    // Store successful results for 24 hours
+    imageCache.set(cacheKey, {
+      data,
+      expiresAt: Date.now() + CACHE_DURATION,
+    });
+
+    return res.json(data);
+  } catch {
+    return res.status(502).json({
+      error: "Unable to retrieve images",
+    });
+  }
 });
 
 app.use("/users", userRouter);

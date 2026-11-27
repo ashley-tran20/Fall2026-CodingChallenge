@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import "./postPage.css";
@@ -24,100 +25,205 @@ interface PixabayImage {
 const isMongoId = (value: string) => /^[a-f\d]{24}$/i.test(value);
 
 const FALLBACK_IMAGE = "/fallback-image.png";
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT;
 
 const PostPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [image, setImage] = useState<PixabayImage | null>(null);
   const [relatedImages, setRelatedImages] = useState<PixabayImage[]>([]);
-  const [saveModalImage, setSaveModalImage] = useState<PixabayImage | null>(null);
+  const [saveModalImage, setSaveModalImage] =
+    useState<PixabayImage | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
 
+    let active = true;
+
+    setImage(null);
+    setRelatedImages([]);
+    setError(null);
+
     const fetchImage = async () => {
-      if (isMongoId(id)) {
-        const pin = await apiRequest.get(`/pins/${id}`).then((res) => res.data);
-        setImage({
-          id: pin._id,
-          webformatURL: pin.media,
-          tags: (pin.tags && pin.tags.length ? pin.tags.join(", ") : pin.title),
-          imageWidth: pin.width,
-          imageHeight: pin.height,
-          user: pin.user?.userName || "Unknown",
-          description: pin.description,
-          isMongoUser: true,
-        });
-      } else {
-        const apiKey = import.meta.env.VITE_PIXABAY_API_KEY;
-        const response = await fetch(
-          `https://pixabay.com/api/?key=${apiKey}&id=${id}`,
-        );
-        const data = await response.json();
-        setImage({ ...data.hits[0], isMongoUser: false });
+      try {
+        if (isMongoId(id)) {
+          const pin = await apiRequest
+            .get(`/pins/${id}`)
+            .then((res) => res.data);
+
+          if (!active) return;
+
+          setImage({
+            id: pin._id,
+            webformatURL: pin.media,
+            tags:
+              pin.tags && pin.tags.length
+                ? pin.tags.join(", ")
+                : pin.title,
+            imageWidth: pin.width,
+            imageHeight: pin.height,
+            user: pin.user?.userName || "Unknown",
+            description: pin.description,
+            isMongoUser: true,
+          });
+        } else {
+          const response = await fetch(
+            `${API_ENDPOINT}/pixabay?id=${encodeURIComponent(id)}`
+          );
+
+          if (!response.ok) {
+            throw new Error("Unable to load image");
+          }
+
+          const data = await response.json();
+
+          if (!data.hits?.length) {
+            throw new Error("Image not found");
+          }
+
+          if (!active) return;
+
+          setImage({
+            ...data.hits[0],
+            isMongoUser: false,
+          });
+        }
+      } catch (error) {
+        console.error("Image loading failed:", error);
+
+        if (active) {
+          setError("Unable to load this image. Please try again.");
+        }
       }
     };
 
     fetchImage();
+
+    return () => {
+      active = false;
+    };
   }, [id]);
 
   useEffect(() => {
     if (!image) return;
 
+    let active = true;
+
     const fetchRelated = async () => {
-      const apiKey = import.meta.env.VITE_PIXABAY_API_KEY;
-      const allTags = image.tags.split(",").map((t) => t.trim());
-      const preciseQuery = allTags.slice(0, 3).join(" ");
-      const broadQuery = allTags[0];
+      try {
+        const allTags = image.tags
+          .split(",")
+          .map((t) => t.trim());
 
-      const [preciseRes, broadRes] = await Promise.all([
-        fetch(
-          `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(
-            preciseQuery,
-          )}&per_page=5`,
-        ).then((r) => r.json()),
-        fetch(
-          `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(
-            broadQuery,
-          )}&per_page=20`,
-        ).then((r) => r.json()),
-      ]);
+        const preciseQuery = allTags.slice(0, 3).join(" ");
+        const broadQuery = allTags[0];
 
-      const preciseHits: PixabayImage[] = preciseRes.hits.filter(
-        (hit: PixabayImage) => hit.id !== image.id,
-      );
-      const preciseIds = new Set(preciseHits.map((hit) => hit.id));
+        const [preciseRes, broadRes] = await Promise.all([
+          fetch(
+            `${API_ENDPOINT}/pixabay?q=${encodeURIComponent(
+              preciseQuery
+            )}&per_page=5`
+          ).then((r) => {
+            if (!r.ok) {
+              throw new Error("Unable to load related images");
+            }
+            return r.json();
+          }),
 
-      const broadHits: PixabayImage[] = broadRes.hits.filter(
-        (hit: PixabayImage) => hit.id !== image.id && !preciseIds.has(hit.id),
-      );
+          fetch(
+            `${API_ENDPOINT}/pixabay?q=${encodeURIComponent(
+              broadQuery
+            )}&per_page=20`
+          ).then((r) => {
+            if (!r.ok) {
+              throw new Error("Unable to load related images");
+            }
+            return r.json();
+          }),
+        ]);
 
-      setRelatedImages([...preciseHits.slice(0, 5), ...broadHits]);
+        const preciseHits: PixabayImage[] =
+          preciseRes.hits.filter(
+            (hit: PixabayImage) => hit.id !== image.id
+          );
+
+        const preciseIds = new Set(
+          preciseHits.map((hit) => hit.id)
+        );
+
+        const broadHits: PixabayImage[] =
+          broadRes.hits.filter(
+            (hit: PixabayImage) =>
+              hit.id !== image.id &&
+              !preciseIds.has(hit.id)
+          );
+
+        if (active) {
+          setRelatedImages([
+            ...preciseHits.slice(0, 5),
+            ...broadHits,
+          ]);
+        }
+      } catch (error) {
+        console.error("Related image loading failed:", error);
+      }
     };
 
     fetchRelated();
+
+    return () => {
+      active = false;
+    };
   }, [image]);
 
   const handleShare = (img: PixabayImage) => {
     const url = `${window.location.origin}/pin/${img.id}`;
+
     if (navigator.share) {
-      navigator.share({ title: img.tags, url });
+      navigator.share({
+        title: img.tags,
+        url,
+      });
     } else {
       navigator.clipboard.writeText(url);
     }
   };
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    if (e.currentTarget.src !== window.location.origin + FALLBACK_IMAGE) {
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement>
+  ) => {
+    if (
+      e.currentTarget.src !==
+      window.location.origin + FALLBACK_IMAGE
+    ) {
       e.currentTarget.src = FALLBACK_IMAGE;
     }
   };
+
+  if (error) {
+    return (
+      <div className="postPage">
+        <IconButton
+          onClick={() => navigate(-1)}
+          className="backButton"
+        >
+          <ArrowBackIcon fontSize="small" />
+        </IconButton>
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   if (!image) return <div>Loading...</div>;
 
   return (
     <div className="postPage">
-      <IconButton onClick={() => navigate(-1)} className="backButton">
+      <IconButton
+        onClick={() => navigate(-1)}
+        className="backButton"
+      >
         <ArrowBackIcon fontSize="small" />
       </IconButton>
 
@@ -134,7 +240,10 @@ const PostPage = () => {
           <PostInteractions image={image} />
 
           {image.isMongoUser ? (
-            <Link to={`/${image.user}`} className="postUser">
+            <Link
+              to={`/${image.user}`}
+              className="postUser"
+            >
               <div className="pixabayAvatar">
                 {image.user?.[0]?.toUpperCase()}
               </div>
@@ -146,12 +255,16 @@ const PostPage = () => {
                 {image.user?.[0]?.toUpperCase()}
               </div>
               <span>{image.user}</span>
-              <span className="externalCreatorTag">External creator</span>
+              <span className="externalCreatorTag">
+                External creator
+              </span>
             </div>
           )}
 
           {image.description && (
-            <p className="postDescription">{image.description}</p>
+            <p className="postDescription">
+              {image.description}
+            </p>
           )}
 
           <div className="commentsSection">
@@ -165,16 +278,24 @@ const PostPage = () => {
       {relatedImages.length > 0 && (
         <div className="moreLikeThis">
           <h2>More like this</h2>
+
           <div className="relatedGrid">
             {relatedImages.map((img) => (
-              <div key={img.id} className="relatedCard">
+              <div
+                key={img.id}
+                className="relatedCard"
+              >
                 <img
                   src={img.webformatURL}
                   alt={img.tags}
                   loading="lazy"
                   onError={handleImageError}
                 />
-                <Link to={`/pin/${img.id}`} className="relatedOverlay" />
+
+                <Link
+                  to={`/pin/${img.id}`}
+                  className="relatedOverlay"
+                />
 
                 <IconButton
                   onClick={() => handleShare(img)}
@@ -186,9 +307,15 @@ const PostPage = () => {
                     display: "none",
                     borderRadius: "8px",
                     backgroundColor: "white",
-                    "&:hover": { backgroundColor: "#e0e0e0" },
-                    "&:active": { backgroundColor: "#bdbdbd" },
-                    ".relatedCard:hover &": { display: "flex" },
+                    "&:hover": {
+                      backgroundColor: "#e0e0e0",
+                    },
+                    "&:active": {
+                      backgroundColor: "#bdbdbd",
+                    },
+                    ".relatedCard:hover &": {
+                      display: "flex",
+                    },
                   }}
                 >
                   <IosShareIcon />
@@ -211,7 +338,9 @@ const PostPage = () => {
                     textTransform: "none",
                     fontWeight: 500,
                     width: "max-content",
-                    ".relatedCard:hover &": { display: "block" },
+                    ".relatedCard:hover &": {
+                      display: "block",
+                    },
                   }}
                 >
                   Save
@@ -228,7 +357,9 @@ const PostPage = () => {
             media: saveModalImage.webformatURL,
             width: saveModalImage.imageWidth,
             height: saveModalImage.imageHeight,
-            title: saveModalImage.tags.split(",")[0]?.trim() || "Untitled",
+            title:
+              saveModalImage.tags.split(",")[0]?.trim() ||
+              "Untitled",
             description: saveModalImage.tags,
           }}
           onClose={() => setSaveModalImage(null)}

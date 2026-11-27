@@ -40,32 +40,40 @@ const Gallery = ({ initialQuery }: GalleryProps) => {
   const observerRef = useRef<HTMLDivElement | null>(null);
   const isFetchingRef = useRef(false);
 
-  const { data: topData } = useQuery({
-    queryKey: ["topPins", preciseQuery],
-    queryFn: async (): Promise<PixabayResponse> => {
-      const apiKey = import.meta.env.VITE_PIXABAY_API_KEY;
-      const response = await fetch(
-        `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(
-          preciseQuery
-        )}&page=1&per_page=5`
-      );
-      return response.json();
-    },
-  });
+ const { data: topData } = useQuery({
+  queryKey: ["topPins", preciseQuery],
+  queryFn: async (): Promise<PixabayResponse> => {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_ENDPOINT}/pixabay?q=${encodeURIComponent(
+        preciseQuery
+      )}&page=1&per_page=5`
+    );
+
+    if (!response.ok) {
+      throw new Error("Unable to load images");
+    }
+
+    return response.json();
+  },
+});
 
   const fetchPins = async ({
-    pageParam,
-  }: {
-    pageParam: number;
-  }): Promise<PixabayResponse> => {
-    const apiKey = import.meta.env.VITE_PIXABAY_API_KEY;
-    const response = await fetch(
-      `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(
-        broadQuery
-      )}&page=${pageParam}&per_page=20`
-    );
-    return response.json();
-  };
+  pageParam,
+}: {
+  pageParam: number;
+}): Promise<PixabayResponse> => {
+  const response = await fetch(
+    `${import.meta.env.VITE_API_ENDPOINT}/pixabay?q=${encodeURIComponent(
+      broadQuery
+    )}&page=${pageParam}&per_page=20`
+  );
+
+  if (!response.ok) {
+    throw new Error("Unable to load images");
+  }
+
+  return response.json();
+};
 
   const { data, fetchNextPage, hasNextPage, status } = useInfiniteQuery({
     queryKey: ["pins", broadQuery],
