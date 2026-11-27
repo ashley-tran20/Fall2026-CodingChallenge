@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch --env-file=.env index.ts"
-  },
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "dev": "tsx watch --env-file=.env index.ts",
+  "start": "tsx index.ts"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
