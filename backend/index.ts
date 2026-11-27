@@ -12,11 +12,13 @@ connectDB();
 
 const app = express();
 
+// Allowed frontend origins
 const allowedOrigins = [
   "http://localhost:5173",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
+// CORS configuration
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -29,6 +31,27 @@ app.use(
     credentials: true,
   })
 );
+
+// Protect state-changing requests against CSRF
+app.use((req, res, next) => {
+  const safeMethods = ["GET", "HEAD", "OPTIONS"];
+
+  if (safeMethods.includes(req.method)) {
+    next();
+    return;
+  }
+
+  const origin = req.get("Origin");
+
+  if (!origin || !allowedOrigins.includes(origin)) {
+    res.status(403).json({
+      message: "Request origin not allowed",
+    });
+    return;
+  }
+
+  next();
+});
 
 app.use(express.json());
 app.use(cookieParser());
@@ -47,10 +70,12 @@ const imageCache = new Map<
 let requestCount = 0;
 let windowStart = Date.now();
 
+// Backend health check
 app.get("/", (req, res) => {
   res.send("Pinny API is running!");
 });
 
+// Pixabay image endpoint
 app.get("/pixabay", async (req, res) => {
   try {
     const apiKey = process.env.PIXABAY_API_KEY;
@@ -188,6 +213,7 @@ app.get("/pixabay", async (req, res) => {
   }
 });
 
+// Application routes
 app.use("/users", userRouter);
 app.use("/pins", pinRouter);
 app.use("/comments", commentRouter);
@@ -195,6 +221,7 @@ app.use("/boards", boardRouter);
 app.use("/notifications", notificationRouter);
 app.use("/uploads", express.static("uploads"));
 
+// Start the server
 const PORT = Number(process.env.PORT) || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
